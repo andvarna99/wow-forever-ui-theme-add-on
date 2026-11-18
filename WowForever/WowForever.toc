@@ -1,0 +1,13 @@
+## Interface: 16001
+## Title: WowForever |cff33ccffTheme|r
+## Notes: Customize UI theme colors: action bar outlines, text colors, and more.
+## Author: Andrea Varnado
+## Version: 0.2.0
+## SavedVariables: WowForeverDB
+
+Core.lua
+ColorPicker.lua
+Modules\ActionBars.lua
+Modules\Text.lua
+Modules\Stubs.lua
+Options.lua
