@@ -10,7 +10,13 @@ ns.moduleOrder = {}
 ---------------------------------------------------------------------------
 
 -- Optional theme keys fall back to "accent" when a preset leaves them out.
-ns.OPTIONAL_THEME_KEYS = { "bars123", "bars45", "bars67", "hover", "glow", "chat", "minimap", "tracker" }
+-- Difficulty and health keys have no fallback: when unset, Blizzard's colors
+-- are left alone.
+ns.OPTIONAL_THEME_KEYS = {
+    "bars123", "bars45", "bars67", "hover", "glow", "chat", "minimap", "tracker",
+    "diffTrivial", "diffEasy", "diffStandard", "diffHard", "diffVeryHard", "health",
+    "iconGlyph", "iconBorder",
+}
 
 ns.presets = {
     Blossom = {
@@ -28,7 +34,15 @@ ns.presets = {
         chat = { r = 1.00, g = 0.77, b = 0.87, a = 1 },     -- petal pink
         minimap = { r = 0.95, g = 0.55, b = 0.70, a = 1 },  -- deep rose
         tracker = { r = 0.89, g = 0.63, b = 0.85, a = 1 },  -- lilac mauve
-        text = { r = 1.00, g = 0.80, b = 0.88 },
+        diffTrivial = { r = 0.620, g = 0.557, b = 0.588 },  -- #9E8E96 dusty mauve
+        diffEasy = { r = 0.659, g = 0.863, b = 0.769 },     -- #A8DCC4 mint
+        diffStandard = { r = 0.961, g = 0.875, b = 0.627 }, -- #F5DFA0 butter
+        diffHard = { r = 0.949, g = 0.553, b = 0.698 },     -- #F28DB2 deep rose
+        diffVeryHard = { r = 0.878, g = 0.314, b = 0.494 }, -- #E0507E raspberry
+        health = { r = 0.659, g = 0.863, b = 0.769, a = 1 }, -- #A8DCC4 mint
+        iconGlyph = { r = 0.878, g = 0.314, b = 0.494, a = 1 }, -- #E0507E raspberry
+        iconBorder = { r = 0.620, g = 0.557, b = 0.588, a = 1 }, -- #9E8E96 dusty mauve
+        text = { r = 0.949, g = 0.553, b = 0.698 },         -- #F28DB2 deep rose
         highlight = { r = 1.00, g = 0.96, b = 0.98 },
     },
     Bubblegum = {

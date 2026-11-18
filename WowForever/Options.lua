@@ -54,11 +54,11 @@ local function CreateHeader(parent, label, y)
 end
 
 local function CreateOptions()
-    local rowCount = #ns.moduleOrder
+    local rowCount = math.ceil(#ns.moduleOrder / 2) -- modules are listed in two columns
     local modulesHeight = 26 * rowCount
 
     frame = CreateFrame("Frame", "WowForeverOptions", UIParent, "BasicFrameTemplateWithInset")
-    frame:SetSize(460, 524 + modulesHeight)
+    frame:SetSize(680, 550 + modulesHeight)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:SetClampedToScreen(true)
@@ -76,7 +76,7 @@ local function CreateOptions()
 
     local y = -36
     CreateHeader(frame, "Theme colors", y)
-    -- Left column: action bars. Right column: other frames and text.
+    -- Columns: action bars | other frames and text | quest difficulty and health.
     CreateSwatch(frame, "Accent (other bars, bags)", "accent", true, 20, y - 22)
     CreateSwatch(frame, "Action bars 1-3", "bars123", true, 20, y - 48)
     CreateSwatch(frame, "Action bars 4-5", "bars45", true, 20, y - 74)
@@ -88,13 +88,22 @@ local function CreateOptions()
     CreateSwatch(frame, "Tracker headers", "tracker", true, 240, y - 74)
     CreateSwatch(frame, "Primary text (gold)", "text", false, 240, y - 100)
     CreateSwatch(frame, "Secondary text (white)", "highlight", false, 240, y - 126)
+    CreateSwatch(frame, "Icons (glyph)", "iconGlyph", true, 240, y - 152)
+    CreateSwatch(frame, "Icon border", "iconBorder", true, 240, y - 178)
+    CreateSwatch(frame, "Quest: trivial", "diffTrivial", false, 460, y - 22)
+    CreateSwatch(frame, "Quest: easy", "diffEasy", false, 460, y - 48)
+    CreateSwatch(frame, "Quest: on-level", "diffStandard", false, 460, y - 74)
+    CreateSwatch(frame, "Quest: hard", "diffHard", false, 460, y - 100)
+    CreateSwatch(frame, "Quest: very hard", "diffVeryHard", false, 460, y - 126)
+    CreateSwatch(frame, "Health bars", "health", true, 460, y - 152)
 
-    y = y - 188
+    y = y - 214
     CreateHeader(frame, "Modules", y)
     for i, name in ipairs(ns.moduleOrder) do
         local module = ns.modules[name]
         local label = module.stub and (module.label .. " (coming soon)") or module.label
-        local check = CreateCheck(frame, label, 16, y - 18 - (i - 1) * 26, function(self)
+        local col, row = (i - 1) % 2, math.floor((i - 1) / 2)
+        local check = CreateCheck(frame, label, 16 + col * 330, y - 18 - row * 26, function(self)
             ns.SetModuleEnabled(name, self:GetChecked())
         end)
         if module.stub then

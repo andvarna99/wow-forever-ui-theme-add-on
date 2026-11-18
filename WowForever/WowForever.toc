@@ -2,15 +2,19 @@
 ## Title: WowForever |cffff78b5Theme|r
 ## Notes: Customize UI theme colors: action bar outlines, text colors, and more.
 ## Author: Andrea Varnado
-## Version: 0.3.0
+## Version: 0.4.0
 ## SavedVariables: WowForeverDB
 
 Core.lua
+Recolor.lua
 ColorPicker.lua
 Modules\ActionBars.lua
 Modules\Text.lua
 Modules\Chat.lua
 Modules\Minimap.lua
 Modules\ObjectiveTracker.lua
+Modules\QuestLog.lua
+Modules\HealthBars.lua
+Modules\Icons.lua
 Modules\Stubs.lua
 Options.lua

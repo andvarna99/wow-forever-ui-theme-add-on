@@ -30,4 +30,5 @@ read_globals = {
     "UIParent", "ColorPickerFrame", "ZoneAbilityFrame", "ObjectiveTrackerFrame",
     "MinimapCompassTexture", "FCFTab_UpdateColors", "NUM_CHAT_WINDOWS",
     "OBJECTIVE_TRACKER_COLOR", "ActionButtonSpellAlertManager", "ActionButton_ShowOverlayGlow",
+    "QuestDifficultyColors", "CompactUnitFrame_UpdateHealthColor",
 }
