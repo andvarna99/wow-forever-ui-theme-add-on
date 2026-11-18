@@ -24,8 +24,10 @@ read_globals = {
     "strsplit", "strtrim", "tinsert", "geterrorhandler", "unpack",
 
     -- API
-    "CreateFrame", "GetBuildInfo", "InCombatLockdown", "hooksecurefunc",
+    "CreateFrame", "GetBuildInfo", "InCombatLockdown", "hooksecurefunc", "C_Timer",
 
-    -- Blizzard frames and font objects
-    "UIParent", "ColorPickerFrame", "ZoneAbilityFrame",
+    -- Blizzard frames, textures, functions, and constants
+    "UIParent", "ColorPickerFrame", "ZoneAbilityFrame", "ObjectiveTrackerFrame",
+    "MinimapCompassTexture", "FCFTab_UpdateColors", "NUM_CHAT_WINDOWS",
+    "OBJECTIVE_TRACKER_COLOR", "ActionButtonSpellAlertManager", "ActionButton_ShowOverlayGlow",
 }

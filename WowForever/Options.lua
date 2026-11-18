@@ -5,10 +5,10 @@ local swatches = {}
 local moduleChecks = {}
 local settingChecks = {}
 
-local function CreateSwatch(parent, label, key, hasAlpha, y)
+local function CreateSwatch(parent, label, key, hasAlpha, x, y)
     local button = CreateFrame("Button", nil, parent)
     button:SetSize(20, 20)
-    button:SetPoint("TOPLEFT", 20, y)
+    button:SetPoint("TOPLEFT", x, y)
 
     local border = button:CreateTexture(nil, "BACKGROUND")
     border:SetAllPoints()
@@ -24,6 +24,8 @@ local function CreateSwatch(parent, label, key, hasAlpha, y)
     text:SetText(label)
 
     button:SetScript("OnClick", function()
+        -- Optional keys start as a copy of the accent until customized.
+        if not ns.db.theme[key] then ns.db.theme[key] = ns.CopyColor(ns.ThemeColor(key)) end
         ns.OpenColorPicker(ns.db.theme[key], hasAlpha, function() ns.ApplyAll() end)
     end)
 
@@ -56,7 +58,7 @@ local function CreateOptions()
     local modulesHeight = 26 * rowCount
 
     frame = CreateFrame("Frame", "WowForeverOptions", UIParent, "BasicFrameTemplateWithInset")
-    frame:SetSize(320, 420 + modulesHeight)
+    frame:SetSize(460, 524 + modulesHeight)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:SetClampedToScreen(true)
@@ -74,11 +76,20 @@ local function CreateOptions()
 
     local y = -36
     CreateHeader(frame, "Theme colors", y)
-    CreateSwatch(frame, "Accent / outlines", "accent", true, y - 22)
-    CreateSwatch(frame, "Primary text (gold)", "text", false, y - 48)
-    CreateSwatch(frame, "Secondary text (white)", "highlight", false, y - 74)
+    -- Left column: action bars. Right column: other frames and text.
+    CreateSwatch(frame, "Accent (other bars, bags)", "accent", true, 20, y - 22)
+    CreateSwatch(frame, "Action bars 1-3", "bars123", true, 20, y - 48)
+    CreateSwatch(frame, "Action bars 4-5", "bars45", true, 20, y - 74)
+    CreateSwatch(frame, "Action bars 6-7", "bars67", true, 20, y - 100)
+    CreateSwatch(frame, "Button hover", "hover", true, 20, y - 126)
+    CreateSwatch(frame, "Glows (was yellow)", "glow", true, 20, y - 152)
+    CreateSwatch(frame, "Chat border", "chat", true, 240, y - 22)
+    CreateSwatch(frame, "Minimap border", "minimap", true, 240, y - 48)
+    CreateSwatch(frame, "Tracker headers", "tracker", true, 240, y - 74)
+    CreateSwatch(frame, "Primary text (gold)", "text", false, 240, y - 100)
+    CreateSwatch(frame, "Secondary text (white)", "highlight", false, 240, y - 126)
 
-    y = y - 110
+    y = y - 188
     CreateHeader(frame, "Modules", y)
     for i, name in ipairs(ns.moduleOrder) do
         local module = ns.modules[name]
@@ -103,9 +114,13 @@ local function CreateOptions()
         ns.db.modules.ActionBars.themeMacroText = self:GetChecked() and true or false
         ns.ApplyAll()
     end)
+    settingChecks.tintHighlights = CreateCheck(frame, "Theme hover and glows", 16, y - 70, function(self)
+        ns.db.modules.ActionBars.tintHighlights = self:GetChecked() and true or false
+        ns.ApplyAll()
+    end)
 
     local sizeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    sizeLabel:SetPoint("TOPLEFT", 20, y - 80)
+    sizeLabel:SetPoint("TOPLEFT", 20, y - 106)
     frame.sizeLabel = sizeLabel
 
     local function StepBorder(delta)
@@ -126,7 +141,7 @@ local function CreateOptions()
     plus:SetText("+")
     plus:SetScript("OnClick", function() StepBorder(1) end)
 
-    y = y - 112
+    y = y - 138
     CreateHeader(frame, "Presets", y)
     for i, name in ipairs(ns.presetOrder) do
         local b = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
@@ -141,7 +156,7 @@ end
 function ns.RefreshOptions()
     if not frame then return end
     for key, swatch in pairs(swatches) do
-        local c = ns.db.theme[key]
+        local c = ns.ThemeColor(key)
         swatch.fill:SetColorTexture(c.r, c.g, c.b, c.a or 1)
     end
     for name, check in pairs(moduleChecks) do

@@ -1,6 +1,6 @@
 local ADDON, ns = ...
 
-ns.DB_VERSION = 2
+ns.DB_VERSION = 3
 ns.modules = {}
 ns.moduleOrder = {}
 
@@ -9,7 +9,33 @@ ns.moduleOrder = {}
 -- UI text; "highlight" replaces the default white UI text.
 ---------------------------------------------------------------------------
 
+-- Optional theme keys fall back to "accent" when a preset leaves them out.
+ns.OPTIONAL_THEME_KEYS = { "bars123", "bars45", "bars67", "hover", "glow", "chat", "minimap", "tracker" }
+
 ns.presets = {
+    Blossom = {
+        accent = { r = 1.00, g = 0.47, b = 0.71, a = 1 },
+        text = { r = 1.00, g = 0.71, b = 0.84 },
+        highlight = { r = 1.00, g = 0.94, b = 0.97 },
+    },
+    Sakura = {
+        accent = { r = 1.00, g = 0.72, b = 0.82, a = 1 },   -- bar 8, pet, stance, bags
+        bars123 = { r = 0.95, g = 0.55, b = 0.70, a = 1 },  -- deep rose
+        bars45 = { r = 1.00, g = 0.77, b = 0.87, a = 1 },   -- petal pink
+        bars67 = { r = 0.89, g = 0.63, b = 0.85, a = 1 },   -- lilac mauve
+        hover = { r = 1.00, g = 0.62, b = 0.77, a = 1 },    -- blush pink (button hover)
+        glow = { r = 0.95, g = 0.55, b = 0.70, a = 1 },     -- deep rose (formerly yellow effects)
+        chat = { r = 1.00, g = 0.77, b = 0.87, a = 1 },     -- petal pink
+        minimap = { r = 0.95, g = 0.55, b = 0.70, a = 1 },  -- deep rose
+        tracker = { r = 0.89, g = 0.63, b = 0.85, a = 1 },  -- lilac mauve
+        text = { r = 1.00, g = 0.80, b = 0.88 },
+        highlight = { r = 1.00, g = 0.96, b = 0.98 },
+    },
+    Bubblegum = {
+        accent = { r = 1.00, g = 0.30, b = 0.62, a = 1 },
+        text = { r = 1.00, g = 0.55, b = 0.75 },
+        highlight = { r = 1.00, g = 0.92, b = 0.96 },
+    },
     Arcane  = {
         accent = { r = 0.20, g = 0.80, b = 1.00, a = 1 },
         text = { r = 0.55, g = 0.85, b = 1.00 },
@@ -36,14 +62,14 @@ ns.presets = {
         highlight = { r = 1.00, g = 1.00, b = 1.00 },
     },
 }
-ns.presetOrder = { "Arcane", "Fel", "Blood", "Void", "Classic" }
+ns.presetOrder = { "Blossom", "Sakura", "Bubblegum", "Arcane", "Fel", "Blood", "Void", "Classic" }
 
 ns.defaults = {
     version = ns.DB_VERSION,
     theme = {
-        accent = { r = 0.20, g = 0.80, b = 1.00, a = 1 },
-        text = { r = 0.55, g = 0.85, b = 1.00 },
-        highlight = { r = 0.95, g = 0.97, b = 1.00 },
+        accent = { r = 1.00, g = 0.47, b = 0.71, a = 1 },
+        text = { r = 1.00, g = 0.71, b = 0.84 },
+        highlight = { r = 1.00, g = 0.94, b = 0.97 },
     },
     modules = {},
 }
@@ -68,8 +94,24 @@ function ns.CopyColor(c)
     return { r = c.r, g = c.g, b = c.b, a = c.a }
 end
 
+-- Returns a copy of color blended toward white by amount (0-1).
+function ns.Lighten(c, amount)
+    return {
+        r = c.r + (1 - c.r) * amount,
+        g = c.g + (1 - c.g) * amount,
+        b = c.b + (1 - c.b) * amount,
+        a = c.a,
+    }
+end
+
+-- Returns the theme color for key, falling back to the accent color.
+function ns.ThemeColor(key)
+    local theme = ns.db.theme
+    return (key and theme[key]) or theme.accent
+end
+
 function ns.Print(msg)
-    print("|cff33ccffWowForever|r: " .. tostring(msg))
+    print("|cffff78b5WowForever|r: " .. tostring(msg))
 end
 
 local function SafeCall(fn, ...)
@@ -132,6 +174,15 @@ migrations[2] = function(db)
     db.modules.Text = text
 
     db.borderSize, db.tintBlizzardBorder, db.themeText = nil, nil, nil
+end
+
+-- v3 (0.3.0): Chat, Minimap, and ObjectiveTracker graduated from stub modules.
+-- Stub defaults saved them as disabled, so switch them on once.
+migrations[3] = function(db)
+    if type(db.modules) ~= "table" then return end
+    for _, name in ipairs({ "Chat", "Minimap", "ObjectiveTracker" }) do
+        if type(db.modules[name]) == "table" then db.modules[name].enabled = true end
+    end
 end
 
 function ns.MigrateDB(db)
@@ -231,6 +282,9 @@ end
 function ns.ApplyPreset(name)
     local preset = ns.presets[name]
     if not preset then return false end
+    for _, key in ipairs(ns.OPTIONAL_THEME_KEYS) do
+        ns.db.theme[key] = nil
+    end
     for key, color in pairs(preset) do
         ns.db.theme[key] = ns.CopyColor(color)
     end
@@ -276,7 +330,7 @@ end)
 
 local function PrintHelp()
     ns.Print("/wf - open options")
-    ns.Print("/wf preset <arcane|fel|blood|void|classic>")
+    ns.Print("/wf preset <" .. table.concat(ns.presetOrder, "|"):lower() .. ">")
     ns.Print("/wf border <0-4> - action bar outline thickness")
     ns.Print("/wf module <name> <on|off> - toggle a module")
     ns.Print("/wf audit - check which Blizzard frames exist on this client")
@@ -300,7 +354,7 @@ SlashCmdList.WOWFOREVER = function(input)
                 return
             end
         end
-        ns.Print("Unknown preset. Try: arcane, fel, blood, void, classic.")
+        ns.Print("Unknown preset. Try: " .. table.concat(ns.presetOrder, ", "):lower() .. ".")
     elseif cmd == "border" and tonumber(rest) then
         local bars = ns.db.modules.ActionBars
         bars.borderSize = math.max(0, math.min(4, math.floor(tonumber(rest))))

@@ -1,20 +1,44 @@
 local _, ns = ...
 
--- Placeholder modules. Each lists the Blizzard frames it will theme so that
--- /wf audit can confirm they exist before any work starts.
+-- Placeholder modules. Each lists the Blizzard frames, regions, and globals it
+-- would theme so /wf audit can confirm they exist before any work starts.
+-- Dotted paths ("WorldMapFrame.BorderFrame") walk child keys from a global.
 local STUBS = {
-    { name = "ObjectiveTracker", label = "Objective tracker", frames = { "ObjectiveTrackerFrame" } },
-    { name = "Minimap", label = "Minimap", frames = { "MinimapCluster", "Minimap" } },
-    { name = "WorldMap", label = "World map", frames = { "WorldMapFrame" } },
-    { name = "Bags", label = "Bags", frames = { "ContainerFrameCombinedBags", "ContainerFrame1" } },
-    { name = "Chat", label = "Chat", frames = { "ChatFrame1", "GeneralDockManager" } },
+    {
+        name = "WorldMap",
+        label = "World map",
+        probes = { "WorldMapFrame", "WorldMapFrame.BorderFrame", "WorldMapFrame.BorderFrame.NineSlice" },
+    },
+    {
+        name = "Bags",
+        label = "Bags",
+        probes = {
+            "ContainerFrameCombinedBags", "ContainerFrameCombinedBags.NineSlice",
+            "ContainerFrame1", "BagsBar",
+        },
+    },
 }
+
+local function Resolve(path)
+    local node
+    for part in path:gmatch("[^%.]+") do
+        if node == nil then
+            node = _G[part]
+        elseif type(node) == "table" then
+            node = node[part]
+        else
+            return nil
+        end
+        if node == nil then return nil end
+    end
+    return node
+end
 
 for _, info in ipairs(STUBS) do
     local M = ns.RegisterModule(info.name, {
         label = info.label,
         stub = true,
-        frames = info.frames,
+        probes = info.probes,
     })
 
     function M:Enable() end
@@ -22,10 +46,17 @@ for _, info in ipairs(STUBS) do
     function M:Disable() end
 
     function M:Audit()
-        local parts = {}
-        for _, frameName in ipairs(self.frames) do
-            parts[#parts + 1] = frameName .. (_G[frameName] and " ok" or " |cffff5555missing|r")
+        local found, missing = {}, {}
+        for _, path in ipairs(self.probes) do
+            if Resolve(path) ~= nil then
+                found[#found + 1] = path
+            else
+                missing[#missing + 1] = path
+            end
         end
-        ns.Print(("  [stub] %s: %s"):format(self.label, table.concat(parts, ", ")))
+        ns.Print(("  [stub] %s: %d/%d found"):format(self.label, #found, #self.probes))
+        if #missing > 0 then
+            ns.Print("    |cffff5555missing: " .. table.concat(missing, ", ") .. "|r")
+        end
     end
 end
