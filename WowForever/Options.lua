@@ -58,7 +58,7 @@ local function CreateOptions()
     local modulesHeight = 26 * rowCount
 
     frame = CreateFrame("Frame", "WowForeverOptions", UIParent, "BasicFrameTemplateWithInset")
-    frame:SetSize(680, 550 + modulesHeight)
+    frame:SetSize(680, 576 + modulesHeight)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:SetClampedToScreen(true)
@@ -76,7 +76,7 @@ local function CreateOptions()
 
     local y = -36
     CreateHeader(frame, "Theme colors", y)
-    -- Columns: action bars | other frames and text | quest difficulty and health.
+    -- Columns: action bars | other frames and text | quest difficulty and power bars.
     CreateSwatch(frame, "Accent (other bars, bags)", "accent", true, 20, y - 22)
     CreateSwatch(frame, "Action bars 1-3", "bars123", true, 20, y - 48)
     CreateSwatch(frame, "Action bars 4-5", "bars45", true, 20, y - 74)
@@ -90,14 +90,15 @@ local function CreateOptions()
     CreateSwatch(frame, "Secondary text (white)", "highlight", false, 240, y - 126)
     CreateSwatch(frame, "Icons (glyph)", "iconGlyph", true, 240, y - 152)
     CreateSwatch(frame, "Icon border", "iconBorder", true, 240, y - 178)
+    CreateSwatch(frame, "NPC chat text", "npcSay", false, 240, y - 204)
     CreateSwatch(frame, "Quest: trivial", "diffTrivial", false, 460, y - 22)
     CreateSwatch(frame, "Quest: easy", "diffEasy", false, 460, y - 48)
     CreateSwatch(frame, "Quest: on-level", "diffStandard", false, 460, y - 74)
     CreateSwatch(frame, "Quest: hard", "diffHard", false, 460, y - 100)
     CreateSwatch(frame, "Quest: very hard", "diffVeryHard", false, 460, y - 126)
-    CreateSwatch(frame, "Health bars", "health", true, 460, y - 152)
+    CreateSwatch(frame, "Mana / rage / energy", "power", true, 460, y - 152)
 
-    y = y - 214
+    y = y - 240
     CreateHeader(frame, "Modules", y)
     for i, name in ipairs(ns.moduleOrder) do
         local module = ns.modules[name]

@@ -1,6 +1,6 @@
 local ADDON, ns = ...
 
-ns.DB_VERSION = 3
+ns.DB_VERSION = 4
 ns.modules = {}
 ns.moduleOrder = {}
 
@@ -10,12 +10,12 @@ ns.moduleOrder = {}
 ---------------------------------------------------------------------------
 
 -- Optional theme keys fall back to "accent" when a preset leaves them out.
--- Difficulty and health keys have no fallback: when unset, Blizzard's colors
--- are left alone.
+-- Difficulty, power, and icon keys have no fallback: when unset, Blizzard's
+-- colors are left alone.
 ns.OPTIONAL_THEME_KEYS = {
     "bars123", "bars45", "bars67", "hover", "glow", "chat", "minimap", "tracker",
-    "diffTrivial", "diffEasy", "diffStandard", "diffHard", "diffVeryHard", "health",
-    "iconGlyph", "iconBorder",
+    "diffTrivial", "diffEasy", "diffStandard", "diffHard", "diffVeryHard", "power",
+    "iconGlyph", "iconBorder", "npcSay",
 }
 
 ns.presets = {
@@ -39,9 +39,10 @@ ns.presets = {
         diffStandard = { r = 0.961, g = 0.875, b = 0.627 }, -- #F5DFA0 butter
         diffHard = { r = 0.949, g = 0.553, b = 0.698 },     -- #F28DB2 deep rose
         diffVeryHard = { r = 0.878, g = 0.314, b = 0.494 }, -- #E0507E raspberry
-        health = { r = 0.659, g = 0.863, b = 0.769, a = 1 }, -- #A8DCC4 mint
+        power = { r = 0.878, g = 0.314, b = 0.494, a = 1 }, -- #E0507E raspberry (mana, rage, energy)
         iconGlyph = { r = 0.878, g = 0.314, b = 0.494, a = 1 }, -- #E0507E raspberry
         iconBorder = { r = 0.620, g = 0.557, b = 0.588, a = 1 }, -- #9E8E96 dusty mauve
+        npcSay = { r = 0.976, g = 0.639, b = 0.796 },       -- #F9A3CB peony (NPC chat text)
         text = { r = 0.949, g = 0.553, b = 0.698 },         -- #F28DB2 deep rose
         highlight = { r = 1.00, g = 0.96, b = 0.98 },
     },
@@ -197,6 +198,13 @@ migrations[3] = function(db)
     for _, name in ipairs({ "Chat", "Minimap", "ObjectiveTracker" }) do
         if type(db.modules[name]) == "table" then db.modules[name].enabled = true end
     end
+end
+
+-- v4 (0.5.0): HealthBars was replaced by PowerBars; drop its settings and the
+-- health color so health bars keep Blizzard's colors.
+migrations[4] = function(db)
+    if type(db.modules) == "table" then db.modules.HealthBars = nil end
+    if type(db.theme) == "table" then db.theme.health = nil end
 end
 
 function ns.MigrateDB(db)
